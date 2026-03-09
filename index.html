@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de CPF</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f4f9; }
+        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
+        #cpf-display { font-size: 1.5rem; font-weight: bold; margin: 1rem 0; color: #333; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Gerador de CPF Válido</h2>
+    <div id="cpf-display">000.000.000-00</div>
+    <button onclick="gerarCPF()">Gerar Novo CPF</button>
+</div>
+
+<script>
+    function gerarDígito(base) {
+        let soma = 0;
+        let multiplicador = base.length + 1;
+
+        for (let num of base) {
+            soma += num * multiplicador;
+            multiplicador--;
+        }
+
+        let resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
+    }
+
+    function gerarCPF() {
+        let noveDigitos = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10));
+        
+        let d1 = gerarDígito(noveDigitos);
+        let d2 = gerarDígito([...noveDigitos, d1]);
+
+        let cpf = [...noveDigitos, d1, d2].join('');
+        
+        // Máscara de formatação (000.000.000-00)
+        let cpfFormatado = cpf.replace(/(\|d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+        
+        // Fallback simples para formatação se o regex falhar no navegador
+        if (cpfFormatado.length < 14) {
+            cpfFormatado = `${cpf.slice(0,3)}.${cpf.slice(3,6)}.${cpf.slice(6,9)}-${cpf.slice(9,11)}`;
+        }
+
+        document.getElementById('cpf-display').innerText = cpfFormatado;
+    }
+</script>
+
+</body>
+</html>
